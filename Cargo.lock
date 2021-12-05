@@ -240,6 +240,7 @@ dependencies = [
  "jtd_codegen_target_ruby",
  "jtd_codegen_target_ruby_sig",
  "jtd_codegen_target_rust",
+ "jtd_codegen_target_swift",
  "jtd_codegen_target_typescript",
  "serde",
  "serde_json",

@@ -257,6 +257,8 @@ Each language supported by `jtd-codegen` supports a different set of overrides:
     * `pythonType` overrides the entire outputted type
 * Rust
     * `rustType` overrides the entire outputted type
+* Swift
+    * `swiftType` overrides the entire outputted type
 * TypeScript
     * `typescriptType` overrides the entire outputted type
 

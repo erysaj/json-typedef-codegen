@@ -1,7 +1,30 @@
 use jtd_codegen::target::{self, inflect, metadata};
 use jtd_codegen::Result;
+use lazy_static::lazy_static;
 use std::collections::{BTreeMap, BTreeSet};
 use std::io::Write;
+
+lazy_static! {
+    static ref KEYWORDS: BTreeSet<String> = include_str!("keywords")
+        .lines()
+        .map(str::to_owned)
+        .collect();
+    static ref TYPE_NAMING_CONVENTION: Box<dyn inflect::Inflector + Send + Sync> =
+        Box::new(inflect::KeywordAvoidingInflector::new(
+            KEYWORDS.clone(),
+            inflect::CombiningInflector::new(inflect::Case::pascal_case())
+        ));
+    static ref FIELD_NAMING_CONVENTION: Box<dyn inflect::Inflector + Send + Sync> =
+        Box::new(inflect::KeywordAvoidingInflector::new(
+            KEYWORDS.clone(),
+            inflect::TailInflector::new(inflect::Case::camel_case())
+        ));
+    static ref ENUM_MEMBER_NAMING_CONVENTION: Box<dyn inflect::Inflector + Send + Sync> =
+        Box::new(inflect::KeywordAvoidingInflector::new(
+            KEYWORDS.clone(),
+            inflect::TailInflector::new(inflect::Case::camel_case())
+        ));
+}
 
 pub struct Target {}
 
@@ -40,12 +63,11 @@ impl jtd_codegen::target::Target for Target {
     }
 
     fn name(&self, kind: target::NameableKind, parts: &[String]) -> String {
-        // match kind {
-        //     target::NameableKind::Type => TYPE_NAMING_CONVENTION.inflect(parts),
-        //     target::NameableKind::Field => FIELD_NAMING_CONVENTION.inflect(parts),
-        //     target::NameableKind::EnumMember => ENUM_MEMBER_NAMING_CONVENTION.inflect(parts),
-        // }
-        "name".into()
+        match kind {
+            target::NameableKind::Type => TYPE_NAMING_CONVENTION.inflect(parts),
+            target::NameableKind::Field => FIELD_NAMING_CONVENTION.inflect(parts),
+            target::NameableKind::EnumMember => ENUM_MEMBER_NAMING_CONVENTION.inflect(parts),
+        }
     }
 
     fn expr(

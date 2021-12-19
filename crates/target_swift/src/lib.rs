@@ -73,7 +73,7 @@ impl jtd_codegen::target::Target for Target {
 
     fn expr(
         &self,
-        state: &mut FileState,
+        _state: &mut FileState,
         metadata: metadata::Metadata,
         expr: target::Expr,
     ) -> String {
@@ -97,7 +97,7 @@ impl jtd_codegen::target::Target for Target {
             target::Expr::String => "String".into(),
             // TODO: generate implementation
             target::Expr::Timestamp => "Timestamp".into(),
-            target::Expr::ArrayOf(sub_expr) => format!("[{}]>", sub_expr),
+            target::Expr::ArrayOf(sub_expr) => format!("[{}]", sub_expr),
             target::Expr::DictOf(sub_expr) => format!("[String: {}]", sub_expr),
             target::Expr::NullableOf(sub_expr) => format!("{}?", sub_expr),
         }
@@ -214,8 +214,8 @@ impl jtd_codegen::target::Target for Target {
             target::Item::Discriminator {
                 metadata,
                 name,
-                variants,
-                tag_json_name,
+                variants: _,
+                tag_json_name: _,
                 ..
             } => {
                 if let Some(s) = metadata.get("swiftType").and_then(|v| v.as_str()) {
@@ -252,7 +252,7 @@ impl jtd_codegen::target::Target for Target {
             target::Item::DiscriminatorVariant {
                 metadata,
                 name,
-                fields,
+                fields: _,
                 ..
             } => {
                 if let Some(s) = metadata.get("swiftType").and_then(|v| v.as_str()) {

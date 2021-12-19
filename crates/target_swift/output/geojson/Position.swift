@@ -39,4 +39,4 @@ import Foundation
 /// Note that, again, this does not mean that a surface with equal height
 /// follows, for example, the curvature of a body of water.  Nor is a
 /// surface of equal height perpendicular to a plumb line.
-typealias Position = [Double]>
+typealias Position = [Double]

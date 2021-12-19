@@ -2,4 +2,4 @@
 
 import Foundation
 
-typealias Root = [String]>
+typealias Root = [String]

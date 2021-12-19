@@ -3,7 +3,7 @@
 import Foundation
 
 public struct Root: Codable {
-    public var bar: [String]>?
+    public var bar: [String]?
 
     public var baz: Bool?
 

@@ -73,4 +73,4 @@ import Foundation
 /// 
 /// Implementers MUST NOT use latitude values greater than 90 or less than
 /// -90 to imply an extent that is not a spherical cap.
-typealias BoundingBox = [Double]>
+typealias BoundingBox = [Double]

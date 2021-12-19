@@ -29,4 +29,4 @@ import Foundation
 /// exterior ring, and any others MUST be interior rings.  The exterior ring
 /// bounds the surface, and the interior rings (if present) bound holes
 /// within the surface.
-typealias LinearRing = [Position]>
+typealias LinearRing = [Position]

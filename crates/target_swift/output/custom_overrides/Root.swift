@@ -3,7 +3,7 @@
 import Foundation
 
 public struct Root: Codable {
-    public var overrideElementsContainer: [String]>
+    public var overrideElementsContainer: [String]
 
     public var overrideTypeDiscriminator: RootOverrideTypeDiscriminator
 

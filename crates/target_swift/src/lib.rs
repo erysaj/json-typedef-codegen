@@ -106,7 +106,7 @@ impl jtd_codegen::target::Target for Target {
     fn item(
         &self,
         out: &mut dyn Write,
-        state: &mut FileState,
+        _state: &mut FileState,
         item: target::Item,
     ) -> Result<Option<String>> {
         Ok(match item {
@@ -122,6 +122,7 @@ impl jtd_codegen::target::Target for Target {
                     env!("CARGO_PKG_VERSION")
                 )?;
 
+                writeln!(out)?;
                 writeln!(out, "import Foundation")?;
                 None
             }
@@ -163,7 +164,7 @@ impl jtd_codegen::target::Target for Target {
                         "{}",
                         enum_variant_description(&metadata, 1, &member.json_value)
                     )?;
-                    writeln!(out, "    case {} = {}", member.name, member.json_value)?;
+                    writeln!(out, "    case {} = \"{}\"", member.name, member.json_value)?;
                 }
 
                 writeln!(out, "}}")?;

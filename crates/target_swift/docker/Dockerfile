@@ -3,12 +3,12 @@ FROM swift:5.5
 ARG MAIN
 
 WORKDIR /work
+RUN mkdir -p /work/Sources/jtd_e2e_test
 
-RUN mkdir /work/src
+COPY /Package.swift /work/Package.swift
+COPY /main.swift /work/Sources/jtd_e2e_test/main.swift
+COPY /gen /work/Sources/jtd_e2e_test/
+RUN sed -i -e "s/MAIN/$MAIN/g" /work/Sources/jtd_e2e_test/main.swift
+RUN swift build
 
-COPY /main.swift /work/src/main.swift
-# COPY /gen /work/src/jtd_codegen_e2e/
-# RUN sed -i -e "s/MAIN/$MAIN/g" /work/src/main.swift
-RUN swiftc src/main.swift -o jtd_e2e_test
-
-ENTRYPOINT jtd_e2e_test
+ENTRYPOINT /work/.build/debug/jtd_e2e_test

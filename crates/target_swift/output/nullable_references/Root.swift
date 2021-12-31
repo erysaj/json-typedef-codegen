@@ -14,4 +14,13 @@ public struct Root: Codable {
     public var nullRefNullString: NullRefNullString
 
     public var nullString: NullString
+
+    enum CodingKeys: String, CodingKey {
+        case notnullRefNotnullString = "notnull_ref_notnull_string"
+        case notnullRefNullString = "notnull_ref_null_string"
+        case notnullString = "notnull_string"
+        case nullRefNotnullString = "null_ref_notnull_string"
+        case nullRefNullString = "null_ref_null_string"
+        case nullString = "null_string"
+    }
 }

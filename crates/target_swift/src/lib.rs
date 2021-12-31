@@ -189,13 +189,12 @@ impl jtd_codegen::target::Target for Target {
                     writeln!(out, "public struct {}: Codable {{}}", name)?;
                 } else {
                     writeln!(out, "public struct {}: Codable {{", name)?;
-                    for (index, field) in fields.into_iter().enumerate() {
+                    for (index, field) in (&fields).into_iter().enumerate() {
                         if index != 0 {
                             writeln!(out)?;
                         }
 
                         write!(out, "{}", description(&field.metadata, 1))?;
-                        // writeln!(out, "    #[serde(rename = {:?})]", field.json_name)?;
                         // if field.optional {
                         //     writeln!(
                         //         out,
@@ -204,6 +203,12 @@ impl jtd_codegen::target::Target for Target {
                         // }
                         writeln!(out, "    public var {}: {}", field.name, field.type_)?;
                     }
+                    writeln!(out)?;
+                    writeln!(out, "    enum CodingKeys: String, CodingKey {{")?;
+                    for field in &fields {
+                        writeln!(out, "        case {} = \"{}\"", field.name, field.json_name)?;
+                    }
+                    writeln!(out, "    }}")?;
 
                     writeln!(out, "}}")?;
                 }

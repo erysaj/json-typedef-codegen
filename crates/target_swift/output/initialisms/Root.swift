@@ -14,4 +14,13 @@ public struct Root: Codable {
     public var wordWithEmbeddedIdInitialism: String
 
     public var wordWithTrailingInitialismId: String
+
+    enum CodingKeys: String, CodingKey {
+        case http = "http"
+        case id = "id"
+        case nestedIdInitialism = "nested_id_initialism"
+        case utf8 = "utf8"
+        case wordWithEmbeddedIdInitialism = "word_with_embedded_id_initialism"
+        case wordWithTrailingInitialismId = "word_with_trailing_initialism_id"
+    }
 }

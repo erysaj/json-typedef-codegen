@@ -14,4 +14,13 @@ public struct Root: Codable {
     public var overrideTypeProperties: RootOverrideTypeProperties
 
     public var overrideValuesContainer: [String: String]
+
+    enum CodingKeys: String, CodingKey {
+        case overrideElementsContainer = "override_elements_container"
+        case overrideTypeDiscriminator = "override_type_discriminator"
+        case overrideTypeEnum = "override_type_enum"
+        case overrideTypeExpr = "override_type_expr"
+        case overrideTypeProperties = "override_type_properties"
+        case overrideValuesContainer = "override_values_container"
+    }
 }

@@ -6,4 +6,9 @@ public struct Root: Codable {
     public var for_: For
 
     public var object: Object
+
+    enum CodingKeys: String, CodingKey {
+        case for_ = "for"
+        case object = "object"
+    }
 }

@@ -24,4 +24,13 @@ public struct Root: Codable {
 
     /// A description for string
     public var stringWithDescription: String
+
+    enum CodingKeys: String, CodingKey {
+        case discriminatorWithDescription = "discriminator_with_description"
+        case enumWithDescription = "enum_with_description"
+        case longDescription = "long_description"
+        case propertiesWithDescription = "properties_with_description"
+        case refWithDescription = "ref_with_description"
+        case stringWithDescription = "string_with_description"
+    }
 }

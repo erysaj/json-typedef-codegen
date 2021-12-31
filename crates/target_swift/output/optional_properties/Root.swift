@@ -8,4 +8,10 @@ public struct Root: Codable {
     public var baz: Bool?
 
     public var foo: String?
+
+    enum CodingKeys: String, CodingKey {
+        case bar = "bar"
+        case baz = "baz"
+        case foo = "foo"
+    }
 }

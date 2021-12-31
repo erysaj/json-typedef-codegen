@@ -4,4 +4,8 @@ import Foundation
 
 public struct RootFooBar0: Codable {
     public var x: String
+
+    enum CodingKeys: String, CodingKey {
+        case x = "x"
+    }
 }

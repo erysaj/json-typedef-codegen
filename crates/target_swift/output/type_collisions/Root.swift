@@ -6,4 +6,9 @@ public struct Root: Codable {
     public var foo: RootFoo
 
     public var fooBar: RootFooBar0
+
+    enum CodingKeys: String, CodingKey {
+        case foo = "foo"
+        case fooBar = "foo_bar"
+    }
 }

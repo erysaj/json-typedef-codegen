@@ -4,4 +4,8 @@ import Foundation
 
 public struct Root: Codable {
     public var foo: Timestamp?
+
+    enum CodingKeys: String, CodingKey {
+        case foo = "foo"
+    }
 }

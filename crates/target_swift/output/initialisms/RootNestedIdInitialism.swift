@@ -6,4 +6,9 @@ public struct RootNestedIdInitialism: Codable {
     public var json: String
 
     public var normalword: String
+
+    enum CodingKeys: String, CodingKey {
+        case json = "json"
+        case normalword = "normalword"
+    }
 }

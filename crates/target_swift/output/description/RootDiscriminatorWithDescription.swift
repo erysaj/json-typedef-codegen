@@ -3,4 +3,34 @@
 import Foundation
 
 /// A description for discriminator
-// Discriminator RootDiscriminatorWithDescription: NOT IMPLEMENTED
+public enum RootDiscriminatorWithDescription {
+    case bar(RootDiscriminatorWithDescriptionBar)
+
+    enum Tag: String {
+        case bar = "bar"
+    }
+
+    enum CodingKeys: String, CodingKey {
+        case tag = "foo"
+    }
+
+    init(from decoder: Decoder) throws {
+        var container = decoder.container(keyedBy: CodingKeys.self)
+
+        let tag = try container.decode(Tag.self, forKey: .tag)
+        switch tag {
+        case .bar:
+            let props = try RootDiscriminatorWithDescriptionBar(from: decoder)
+            self = .bar(props)
+        }
+    }
+
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+
+        switch self {
+        case let .bar(props):
+            try props.encode(to: encoder)
+        }
+    }
+}

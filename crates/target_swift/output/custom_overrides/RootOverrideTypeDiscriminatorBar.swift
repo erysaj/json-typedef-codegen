@@ -2,4 +2,4 @@
 
 import Foundation
 
-// DiscriminatorVariant RootOverrideTypeDiscriminatorBar: NOT IMPLEMENTED
+public struct RootOverrideTypeDiscriminatorBar: Codable {}

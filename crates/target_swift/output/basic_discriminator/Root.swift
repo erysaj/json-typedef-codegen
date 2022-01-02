@@ -2,4 +2,41 @@
 
 import Foundation
 
-// Discriminator Root: NOT IMPLEMENTED
+public enum Root {
+    case barBaz(RootBarBaz)
+    case quux(RootQuux)
+
+    enum Tag: String {
+        case barBaz = "BAR_BAZ"
+        case quux = "QUUX"
+    }
+
+    enum CodingKeys: String, CodingKey {
+        case tag = "foo"
+    }
+
+    init(from decoder: Decoder) throws {
+        var container = decoder.container(keyedBy: CodingKeys.self)
+
+        let tag = try container.decode(Tag.self, forKey: .tag)
+        switch tag {
+        case .barBaz:
+            let props = try RootBarBaz(from: decoder)
+            self = .barBaz(props)
+        case .quux:
+            let props = try RootQuux(from: decoder)
+            self = .quux(props)
+        }
+    }
+
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+
+        switch self {
+        case let .barBaz(props):
+            try props.encode(to: encoder)
+        case let .quux(props):
+            try props.encode(to: encoder)
+        }
+    }
+}

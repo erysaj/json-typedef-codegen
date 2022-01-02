@@ -7,4 +7,22 @@ import Foundation
 /// with the name "features".  The value of "features" is a JSON array.
 /// Each element of the array is a Feature object as defined above.  It
 /// is possible for this array to be empty.
-// DiscriminatorVariant GeojsonObjectFeatureCollection: NOT IMPLEMENTED
+public struct GeojsonObjectFeatureCollection: Codable {
+    public var features: [GeojsonObject]
+
+    enum CodingKeys: String, CodingKey {
+        case features = "features"
+    }
+
+    init(from decoder: Decoder) throws {
+        var container = decoder.container(keyedBy: CodingKeys.self)
+
+        self.features = try container.decode([GeojsonObject].self, forKey: features)
+    }
+
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+
+        try container.encode(self.features, forKey: features)
+    }
+}

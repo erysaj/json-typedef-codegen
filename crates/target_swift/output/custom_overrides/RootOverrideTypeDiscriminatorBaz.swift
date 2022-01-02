@@ -2,4 +2,4 @@
 
 import Foundation
 
-// DiscriminatorVariant RootOverrideTypeDiscriminatorBaz: NOT IMPLEMENTED
+public struct RootOverrideTypeDiscriminatorBaz: Codable {}

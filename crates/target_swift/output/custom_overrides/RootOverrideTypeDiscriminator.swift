@@ -2,4 +2,41 @@
 
 import Foundation
 
-// Discriminator RootOverrideTypeDiscriminator: NOT IMPLEMENTED
+public enum RootOverrideTypeDiscriminator {
+    case bar(RootOverrideTypeDiscriminatorBar)
+    case baz(RootOverrideTypeDiscriminatorBaz)
+
+    enum Tag: String {
+        case bar = "bar"
+        case baz = "baz"
+    }
+
+    enum CodingKeys: String, CodingKey {
+        case tag = "foo"
+    }
+
+    init(from decoder: Decoder) throws {
+        var container = decoder.container(keyedBy: CodingKeys.self)
+
+        let tag = try container.decode(Tag.self, forKey: .tag)
+        switch tag {
+        case .bar:
+            let props = try RootOverrideTypeDiscriminatorBar(from: decoder)
+            self = .bar(props)
+        case .baz:
+            let props = try RootOverrideTypeDiscriminatorBaz(from: decoder)
+            self = .baz(props)
+        }
+    }
+
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+
+        switch self {
+        case let .bar(props):
+            try props.encode(to: encoder)
+        case let .baz(props):
+            try props.encode(to: encoder)
+        }
+    }
+}

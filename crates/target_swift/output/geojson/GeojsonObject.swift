@@ -15,4 +15,90 @@ import Foundation
 ///     elements in this array is determined by the type of geometry.
 ///     GeoJSON processors MAY interpret Geometry objects with empty
 ///     "coordinates" arrays as null objects.
-// Discriminator GeojsonObject: NOT IMPLEMENTED
+public enum GeojsonObject {
+    case feature(GeojsonObjectFeature)
+    case featureCollection(GeojsonObjectFeatureCollection)
+    case geometryCollection(GeojsonObjectGeometryCollection)
+    case lineString(GeojsonObjectLineString)
+    case multiLineString(GeojsonObjectMultiLineString)
+    case multiPoint(GeojsonObjectMultiPoint)
+    case multiPolygon(GeojsonObjectMultiPolygon)
+    case point(GeojsonObjectPoint)
+    case polygon(GeojsonObjectPolygon)
+
+    enum Tag: String {
+        case feature = "Feature"
+        case featureCollection = "FeatureCollection"
+        case geometryCollection = "GeometryCollection"
+        case lineString = "LineString"
+        case multiLineString = "MultiLineString"
+        case multiPoint = "MultiPoint"
+        case multiPolygon = "MultiPolygon"
+        case point = "Point"
+        case polygon = "Polygon"
+    }
+
+    enum CodingKeys: String, CodingKey {
+        case tag = "type"
+    }
+
+    init(from decoder: Decoder) throws {
+        var container = decoder.container(keyedBy: CodingKeys.self)
+
+        let tag = try container.decode(Tag.self, forKey: .tag)
+        switch tag {
+        case .feature:
+            let props = try GeojsonObjectFeature(from: decoder)
+            self = .feature(props)
+        case .featureCollection:
+            let props = try GeojsonObjectFeatureCollection(from: decoder)
+            self = .featureCollection(props)
+        case .geometryCollection:
+            let props = try GeojsonObjectGeometryCollection(from: decoder)
+            self = .geometryCollection(props)
+        case .lineString:
+            let props = try GeojsonObjectLineString(from: decoder)
+            self = .lineString(props)
+        case .multiLineString:
+            let props = try GeojsonObjectMultiLineString(from: decoder)
+            self = .multiLineString(props)
+        case .multiPoint:
+            let props = try GeojsonObjectMultiPoint(from: decoder)
+            self = .multiPoint(props)
+        case .multiPolygon:
+            let props = try GeojsonObjectMultiPolygon(from: decoder)
+            self = .multiPolygon(props)
+        case .point:
+            let props = try GeojsonObjectPoint(from: decoder)
+            self = .point(props)
+        case .polygon:
+            let props = try GeojsonObjectPolygon(from: decoder)
+            self = .polygon(props)
+        }
+    }
+
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+
+        switch self {
+        case let .feature(props):
+            try props.encode(to: encoder)
+        case let .featureCollection(props):
+            try props.encode(to: encoder)
+        case let .geometryCollection(props):
+            try props.encode(to: encoder)
+        case let .lineString(props):
+            try props.encode(to: encoder)
+        case let .multiLineString(props):
+            try props.encode(to: encoder)
+        case let .multiPoint(props):
+            try props.encode(to: encoder)
+        case let .multiPolygon(props):
+            try props.encode(to: encoder)
+        case let .point(props):
+            try props.encode(to: encoder)
+        case let .polygon(props):
+            try props.encode(to: encoder)
+        }
+    }
+}

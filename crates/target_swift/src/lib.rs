@@ -1,8 +1,7 @@
 use jtd_codegen::target::{self, inflect, metadata};
 use jtd_codegen::Result;
 use lazy_static::lazy_static;
-use serde_json::Value;
-use std::collections::{BTreeMap, BTreeSet};
+use std::collections::{BTreeSet};
 use std::io::Write;
 
 lazy_static! {
@@ -150,25 +149,7 @@ impl jtd_codegen::target::Target for Target {
                     return Ok(Some(s.into()));
                 }
 
-                writeln!(out)?;
-                write!(out, "{}", description(&metadata, 0))?;
-                writeln!(out, "public enum {}: String, Codable {{", name)?;
-
-                for (index, member) in members.into_iter().enumerate() {
-                    if index != 0 {
-                        writeln!(out)?;
-                    }
-
-                    write!(
-                        out,
-                        "{}",
-                        enum_variant_description(&metadata, 1, &member.json_value)
-                    )?;
-                    writeln!(out, "    case {} = \"{}\"", member.name, member.json_value)?;
-                }
-
-                writeln!(out, "}}")?;
-
+                write!(out, "{}", enum_implementation(&metadata, &name, &members))?;
                 None
             }
 
@@ -182,137 +163,36 @@ impl jtd_codegen::target::Target for Target {
                     return Ok(Some(s.into()));
                 }
 
-                writeln!(out)?;
-                write!(out, "{}", description(&metadata, 0))?;
-
-                if fields.is_empty() {
-                    writeln!(out, "public struct {}: Codable {{}}", name)?;
-                } else {
-                    writeln!(out, "public struct {}: Codable {{", name)?;
-                    for (index, field) in fields.iter().enumerate() {
-                        if index != 0 {
-                            writeln!(out)?;
-                        }
-
-                        write!(out, "{}", description(&field.metadata, 1))?;
-                        // if field.optional {
-                        //     writeln!(
-                        //         out,
-                        //         "    #[serde(skip_serializing_if = \"Option::is_none\")]"
-                        //     )?;
-                        // }
-                        writeln!(out, "    public var {}: {}", field.name, field.type_)?;
-                    }
-
-                    // explicit CodingKeys
-                    writeln!(out)?;
-                    writeln!(out, "    enum CodingKeys: String, CodingKey {{")?;
-                    for field in &fields {
-                        writeln!(out, "        case {} = \"{}\"", field.name, field.json_name)?;
-                    }
-                    writeln!(out, "    }}")?;
-
-                    // Decodable implementation
-                    writeln!(out)?;
-                    writeln!(out, "    init(from decoder: Decoder) throws {{")?;
-                    writeln!(out, "        var container = decoder.container(keyedBy: CodingKeys.self)")?;
-                    writeln!(out)?;
-                    for field in &fields {
-                        writeln!(out, "        self.{0} = try container.decode({1}.self, forKey: {0})", field.name, field.type_)?;
-                    }
-                    writeln!(out, "    }}")?;
-                    
-                    // Encodable implementation
-                    writeln!(out)?;
-                    writeln!(out, "    func encode(to encoder: Encoder) throws {{")?;
-                    writeln!(out, "        var container = encoder.container(keyedBy: CodingKeys.self)")?;
-                    writeln!(out)?;
-                    for field in &fields {
-                        writeln!(out, "        try container.encode(self.{0}, forKey: {0})", field.name)?;
-                    }
-                    writeln!(out, "    }}")?;
-
-                    writeln!(out, "}}")?;
-                }
-
+                write!(out, "{}", struct_implementation(&metadata, &name, &fields))?;
                 None
             }
 
             target::Item::Discriminator {
                 metadata,
                 name,
-                variants: _,
-                tag_json_name: _,
-                ..
+                tag_field_name,
+                tag_json_name,
+                variants,
             } => {
                 if let Some(s) = metadata.get("swiftType").and_then(|v| v.as_str()) {
                     return Ok(Some(s.into()));
                 }
 
-
-                writeln!(out)?;
-                write!(out, "{}", description(&metadata, 0))?;
-                writeln!(out, "// Discriminator {}: NOT IMPLEMENTED", name)?;
-                // writeln!(out, "#[derive(Serialize, Deserialize)]")?;
-                // writeln!(out, "#[serde(tag = {:?})]", tag_json_name)?;
-                // writeln!(out, "pub enum {} {{", name)?;
-
-                // for (index, variant) in variants.into_iter().enumerate() {
-                //     if index != 0 {
-                //         writeln!(out)?;
-                //     }
-
-                //     writeln!(out, "    #[serde(rename = {:?})]", variant.tag_value)?;
-                //     writeln!(
-                //         out,
-                //         "    {}({}),",
-                //         inflect::Case::pascal_case().inflect(&[variant.field_name]),
-                //         variant.type_name
-                //     )?;
-                // }
-
-                // writeln!(out, "}}")?;
-
+                write!(out, "{}", enum_with_associated_data_implementation(&metadata, &name, &tag_field_name, &tag_json_name, &variants))?;
                 None
             }
 
             target::Item::DiscriminatorVariant {
                 metadata,
                 name,
-                fields: _,
+                fields,
                 ..
             } => {
                 if let Some(s) = metadata.get("swiftType").and_then(|v| v.as_str()) {
                     return Ok(Some(s.into()));
                 }
 
-                writeln!(out)?;
-                write!(out, "{}", description(&metadata, 0))?;
-                writeln!(out, "// DiscriminatorVariant {}: NOT IMPLEMENTED", name)?;
-
-                // if fields.is_empty() {
-                //     writeln!(out, "pub struct {} {{}}", name)?;
-                // } else {
-                //     writeln!(out, "pub struct {} {{", name)?;
-                //     for (index, field) in fields.into_iter().enumerate() {
-                //         if index != 0 {
-                //             writeln!(out)?;
-                //         }
-
-                //         write!(out, "{}", description(&field.metadata, 1))?;
-                //         writeln!(out, "    #[serde(rename = {:?})]", field.json_name)?;
-                //         if field.optional {
-                //             writeln!(
-                //                 out,
-                //                 "    #[serde(skip_serializing_if = \"Option::is_none\")]"
-                //             )?;
-                //         }
-                //         writeln!(out, "    pub {}: {},", field.name, field.type_)?;
-                //     }
-
-                //     writeln!(out, "}}")?;
-                // }
-
+                write!(out, "{}", struct_implementation(&metadata, &name, &fields))?;
                 None
             }
         })
@@ -322,24 +202,168 @@ impl jtd_codegen::target::Target for Target {
 #[derive(Default)]
 pub struct FileState {}
 
-fn description(metadata: &BTreeMap<String, Value>, indent: usize) -> String {
-    doc(indent, jtd_codegen::target::metadata::description(metadata))
+fn doc(indent: usize, s: &str) -> String {
+    let prefix = "    ".repeat(indent);
+    target::fmt::comment_block("", &format!("{}/// ", prefix), "", s)
+}
+
+fn description(metadata: &metadata::Metadata, indent: usize) -> String {
+    doc(indent, metadata::description(metadata))
 }
 
 fn enum_variant_description(
-    metadata: &BTreeMap<String, Value>,
+    metadata: &metadata::Metadata,
     indent: usize,
     value: &str,
 ) -> String {
-    doc(
-        indent,
-        jtd_codegen::target::metadata::enum_variant_description(metadata, value),
-    )
+    doc(indent, metadata::enum_variant_description(metadata, value))
 }
 
-fn doc(indent: usize, s: &str) -> String {
-    let prefix = "    ".repeat(indent);
-    jtd_codegen::target::fmt::comment_block("", &format!("{}/// ", prefix), "", s)
+fn enum_implementation(
+    metadata: &metadata::Metadata,
+    name: &str,
+    members: &Vec<target::EnumMember>,
+) -> String {
+    let mut chunks: Vec<String> = vec![];
+
+    chunks.push(format!("\n"));
+    chunks.push(description(&metadata, 0));
+    chunks.push(format!("public enum {}: String, Codable {{\n", name));
+
+    for (index, member) in members.iter().enumerate() {
+        if index != 0 {
+            chunks.push(format!("\n"));
+        }
+
+        chunks.push(enum_variant_description(&metadata, 1, &member.json_value));
+        chunks.push(format!("    case {} = \"{}\"\n", member.name, member.json_value));
+    }
+    chunks.push(format!("}}\n"));
+
+    chunks.join("")
+}
+
+fn struct_implementation(
+    metadata: &metadata::Metadata,
+    name: &str,
+    fields: &Vec<target::Field>
+) -> String {
+    let mut chunks: Vec<String> = vec![];
+
+    chunks.push(format!("\n"));
+    chunks.push(description(&metadata, 0));
+
+    if fields.is_empty() {
+        chunks.push(format!("public struct {}: Codable {{}}\n", name));
+    } else {
+        chunks.push(format!("public struct {}: Codable {{\n", name));
+        for (index, field) in fields.iter().enumerate() {
+            if index != 0 {
+                chunks.push(format!("\n"));
+            }
+
+            chunks.push(description(&field.metadata, 1));
+            // if field.optional {
+            //     writeln!(
+            //         out,
+            //         "    #[serde(skip_serializing_if = \"Option::is_none\")]"
+            //     )?;
+            // }
+            chunks.push(format!("    public var {}: {}\n", field.name, field.type_));
+        }
+
+        chunks.push(format!("\n"));
+        chunks.push(format!("    enum CodingKeys: String, CodingKey {{\n"));
+        for field in fields {
+            chunks.push(format!("        case {} = \"{}\"\n", field.name, field.json_name));
+        }
+        chunks.push(format!("    }}\n"));
+
+        // Decodable implementation
+        chunks.push(format!("\n"));
+        chunks.push(format!("    init(from decoder: Decoder) throws {{\n"));
+        chunks.push(format!("        var container = decoder.container(keyedBy: CodingKeys.self)\n"));
+        chunks.push(format!("\n"));
+        for field in fields {
+            chunks.push(format!("        self.{0} = try container.decode({1}.self, forKey: {0})\n", field.name, field.type_));
+        }
+        chunks.push(format!("    }}\n"));
+        
+        // Encodable implementation
+        chunks.push(format!("\n"));
+        chunks.push(format!("    func encode(to encoder: Encoder) throws {{\n"));
+        chunks.push(format!("        var container = encoder.container(keyedBy: CodingKeys.self)\n"));
+        chunks.push(format!("\n"));
+        for field in fields {
+            chunks.push(format!("        try container.encode(self.{0}, forKey: {0})\n", field.name));
+        }
+        chunks.push(format!("    }}\n"));
+
+        chunks.push(format!("}}\n"));
+    }
+
+    chunks.join("")
+}
+
+fn enum_with_associated_data_implementation(
+    metadata: &metadata::Metadata,
+    name: &str,
+    tag_field_name: &str,
+    tag_json_name: &str,
+    variants: &Vec<target::DiscriminatorVariantInfo>
+) -> String {
+    let mut chunks: Vec<String> = vec![];
+
+    chunks.push(format!("\n"));
+    chunks.push(description(&metadata, 0));
+    chunks.push(format!("public enum {} {{\n", name));
+    for variant in variants {
+        chunks.push(format!("    case {}({})\n", variant.field_name, variant.type_name));
+    }
+
+    chunks.push(format!("\n"));
+    chunks.push(format!("    enum Tag: String {{\n"));
+    for variant in variants {
+        chunks.push(format!("        case {} = \"{}\"\n", variant.field_name, variant.tag_value));
+    }
+    chunks.push(format!("    }}\n"));
+
+    chunks.push(format!("\n"));
+    chunks.push(format!("    enum CodingKeys: String, CodingKey {{\n"));
+    chunks.push(format!("        case tag = \"{}\"\n", tag_json_name));
+    chunks.push(format!("    }}\n"));
+
+    // Decodable implementation
+    chunks.push(format!("\n"));
+    chunks.push(format!("    init(from decoder: Decoder) throws {{\n"));
+    chunks.push(format!("        var container = decoder.container(keyedBy: CodingKeys.self)\n"));
+    chunks.push(format!("\n"));
+    chunks.push(format!("        let tag = try container.decode(Tag.self, forKey: .tag)\n"));
+    chunks.push(format!("        switch tag {{\n"));
+    for variant in variants {
+        chunks.push(format!("        case .{}:\n", variant.field_name));
+        chunks.push(format!("            let props = try {}(from: decoder)\n", variant.type_name));
+        chunks.push(format!("            self = .{}(props)\n", variant.field_name));
+    }
+    chunks.push(format!("        }}\n"));
+    chunks.push(format!("    }}\n"));
+
+    // Encodable implementation
+    chunks.push(format!("\n"));
+    chunks.push(format!("    func encode(to encoder: Encoder) throws {{\n"));
+    chunks.push(format!("        var container = encoder.container(keyedBy: CodingKeys.self)\n"));
+    chunks.push(format!("\n"));
+    chunks.push(format!("        switch self {{\n"));
+    for variant in variants {
+        chunks.push(format!("        case let .{}(props):\n", variant.field_name));
+        chunks.push(format!("            try props.encode(to: encoder)\n"));
+    }
+    chunks.push(format!("        }}\n"));
+    chunks.push(format!("    }}\n"));
+
+    chunks.push(format!("}}\n"));
+
+    chunks.join("")
 }
 
 #[cfg(test)]

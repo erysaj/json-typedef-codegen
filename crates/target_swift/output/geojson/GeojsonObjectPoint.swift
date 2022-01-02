@@ -3,4 +3,27 @@
 import Foundation
 
 /// For type "Point", the "coordinates" member is a single position.
-// DiscriminatorVariant GeojsonObjectPoint: NOT IMPLEMENTED
+public struct GeojsonObjectPoint: Codable {
+    public var coordinates: Position
+
+    public var bbox: BoundingBox?
+
+    enum CodingKeys: String, CodingKey {
+        case coordinates = "coordinates"
+        case bbox = "bbox"
+    }
+
+    init(from decoder: Decoder) throws {
+        var container = decoder.container(keyedBy: CodingKeys.self)
+
+        self.coordinates = try container.decode(Position.self, forKey: coordinates)
+        self.bbox = try container.decode(BoundingBox?.self, forKey: bbox)
+    }
+
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+
+        try container.encode(self.coordinates, forKey: coordinates)
+        try container.encode(self.bbox, forKey: bbox)
+    }
+}

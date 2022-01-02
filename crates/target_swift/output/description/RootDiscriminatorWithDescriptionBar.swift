@@ -3,4 +3,4 @@
 import Foundation
 
 /// A description for discriminator variant
-// DiscriminatorVariant RootDiscriminatorWithDescriptionBar: NOT IMPLEMENTED
+public struct RootDiscriminatorWithDescriptionBar: Codable {}

@@ -2,4 +2,27 @@
 
 import Foundation
 
-// DiscriminatorVariant RootBar: NOT IMPLEMENTED
+public struct RootBar: Codable {
+    public var baz: [String]?
+
+    public var quux: Bool?
+
+    enum CodingKeys: String, CodingKey {
+        case baz = "baz"
+        case quux = "quux"
+    }
+
+    init(from decoder: Decoder) throws {
+        var container = decoder.container(keyedBy: CodingKeys.self)
+
+        self.baz = try container.decode([String]?.self, forKey: baz)
+        self.quux = try container.decode(Bool?.self, forKey: quux)
+    }
+
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+
+        try container.encode(self.baz, forKey: baz)
+        try container.encode(self.quux, forKey: quux)
+    }
+}

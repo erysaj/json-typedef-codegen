@@ -16,4 +16,39 @@ import Foundation
 /// o  A Feature object has a member with the name "properties".  The
 ///     value of the properties member is an object (any JSON object or
 ///     a JSON null value).
-// DiscriminatorVariant GeojsonObjectFeature: NOT IMPLEMENTED
+public struct GeojsonObjectFeature: Codable {
+    /// The GeoJSON specification requires that these elements be
+    /// GeoJSON geometry objects, but such a constraint can't be
+    /// expressed in JSON Type Definition.
+    /// 
+    /// It is semantically invalid at the GeoJSON level for this
+    /// member to be any GeoJSON object type other than one of the
+    /// geometry types.
+    public var geometry: GeojsonObject?
+
+    public var properties: [String: Any]
+
+    public var id: Any
+
+    enum CodingKeys: String, CodingKey {
+        case geometry = "geometry"
+        case properties = "properties"
+        case id = "id"
+    }
+
+    init(from decoder: Decoder) throws {
+        var container = decoder.container(keyedBy: CodingKeys.self)
+
+        self.geometry = try container.decode(GeojsonObject?.self, forKey: geometry)
+        self.properties = try container.decode([String: Any].self, forKey: properties)
+        self.id = try container.decode(Any.self, forKey: id)
+    }
+
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+
+        try container.encode(self.geometry, forKey: geometry)
+        try container.encode(self.properties, forKey: properties)
+        try container.encode(self.id, forKey: id)
+    }
+}

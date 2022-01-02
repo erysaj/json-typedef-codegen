@@ -33,4 +33,26 @@ public struct Root: Codable {
         case refWithDescription = "ref_with_description"
         case stringWithDescription = "string_with_description"
     }
+
+    init(from decoder: Decoder) throws {
+        var container = decoder.container(keyedBy: CodingKeys.self)
+
+        self.discriminatorWithDescription = try container.decode(RootDiscriminatorWithDescription.self, forKey: discriminatorWithDescription)
+        self.enumWithDescription = try container.decode(RootEnumWithDescription.self, forKey: enumWithDescription)
+        self.longDescription = try container.decode(String.self, forKey: longDescription)
+        self.propertiesWithDescription = try container.decode(RootPropertiesWithDescription.self, forKey: propertiesWithDescription)
+        self.refWithDescription = try container.decode(Baz.self, forKey: refWithDescription)
+        self.stringWithDescription = try container.decode(String.self, forKey: stringWithDescription)
+    }
+
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+
+        try container.encode(self.discriminatorWithDescription, forKey: discriminatorWithDescription)
+        try container.encode(self.enumWithDescription, forKey: enumWithDescription)
+        try container.encode(self.longDescription, forKey: longDescription)
+        try container.encode(self.propertiesWithDescription, forKey: propertiesWithDescription)
+        try container.encode(self.refWithDescription, forKey: refWithDescription)
+        try container.encode(self.stringWithDescription, forKey: stringWithDescription)
+    }
 }

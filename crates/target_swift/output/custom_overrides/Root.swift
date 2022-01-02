@@ -23,4 +23,26 @@ public struct Root: Codable {
         case overrideTypeProperties = "override_type_properties"
         case overrideValuesContainer = "override_values_container"
     }
+
+    init(from decoder: Decoder) throws {
+        var container = decoder.container(keyedBy: CodingKeys.self)
+
+        self.overrideElementsContainer = try container.decode([String].self, forKey: overrideElementsContainer)
+        self.overrideTypeDiscriminator = try container.decode(RootOverrideTypeDiscriminator.self, forKey: overrideTypeDiscriminator)
+        self.overrideTypeEnum = try container.decode(RootOverrideTypeEnum.self, forKey: overrideTypeEnum)
+        self.overrideTypeExpr = try container.decode(String.self, forKey: overrideTypeExpr)
+        self.overrideTypeProperties = try container.decode(RootOverrideTypeProperties.self, forKey: overrideTypeProperties)
+        self.overrideValuesContainer = try container.decode([String: String].self, forKey: overrideValuesContainer)
+    }
+
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+
+        try container.encode(self.overrideElementsContainer, forKey: overrideElementsContainer)
+        try container.encode(self.overrideTypeDiscriminator, forKey: overrideTypeDiscriminator)
+        try container.encode(self.overrideTypeEnum, forKey: overrideTypeEnum)
+        try container.encode(self.overrideTypeExpr, forKey: overrideTypeExpr)
+        try container.encode(self.overrideTypeProperties, forKey: overrideTypeProperties)
+        try container.encode(self.overrideValuesContainer, forKey: overrideValuesContainer)
+    }
 }

@@ -11,4 +11,18 @@ public struct Root: Codable {
         case foo = "Foo"
         case foo0 = "foo"
     }
+
+    init(from decoder: Decoder) throws {
+        var container = decoder.container(keyedBy: CodingKeys.self)
+
+        self.foo = try container.decode(String.self, forKey: foo)
+        self.foo0 = try container.decode(String.self, forKey: foo0)
+    }
+
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+
+        try container.encode(self.foo, forKey: foo)
+        try container.encode(self.foo0, forKey: foo0)
+    }
 }

@@ -23,4 +23,26 @@ public struct Root: Codable {
         case wordWithEmbeddedIdInitialism = "word_with_embedded_id_initialism"
         case wordWithTrailingInitialismId = "word_with_trailing_initialism_id"
     }
+
+    init(from decoder: Decoder) throws {
+        var container = decoder.container(keyedBy: CodingKeys.self)
+
+        self.http = try container.decode(String.self, forKey: http)
+        self.id = try container.decode(String.self, forKey: id)
+        self.nestedIdInitialism = try container.decode(RootNestedIdInitialism.self, forKey: nestedIdInitialism)
+        self.utf8 = try container.decode(String.self, forKey: utf8)
+        self.wordWithEmbeddedIdInitialism = try container.decode(String.self, forKey: wordWithEmbeddedIdInitialism)
+        self.wordWithTrailingInitialismId = try container.decode(String.self, forKey: wordWithTrailingInitialismId)
+    }
+
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+
+        try container.encode(self.http, forKey: http)
+        try container.encode(self.id, forKey: id)
+        try container.encode(self.nestedIdInitialism, forKey: nestedIdInitialism)
+        try container.encode(self.utf8, forKey: utf8)
+        try container.encode(self.wordWithEmbeddedIdInitialism, forKey: wordWithEmbeddedIdInitialism)
+        try container.encode(self.wordWithTrailingInitialismId, forKey: wordWithTrailingInitialismId)
+    }
 }

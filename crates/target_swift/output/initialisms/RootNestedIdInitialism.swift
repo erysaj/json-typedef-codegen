@@ -11,4 +11,18 @@ public struct RootNestedIdInitialism: Codable {
         case json = "json"
         case normalword = "normalword"
     }
+
+    init(from decoder: Decoder) throws {
+        var container = decoder.container(keyedBy: CodingKeys.self)
+
+        self.json = try container.decode(String.self, forKey: json)
+        self.normalword = try container.decode(String.self, forKey: normalword)
+    }
+
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+
+        try container.encode(self.json, forKey: json)
+        try container.encode(self.normalword, forKey: normalword)
+    }
 }

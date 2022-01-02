@@ -23,4 +23,26 @@ public struct Root: Codable {
         case nullRefNullString = "null_ref_null_string"
         case nullString = "null_string"
     }
+
+    init(from decoder: Decoder) throws {
+        var container = decoder.container(keyedBy: CodingKeys.self)
+
+        self.notnullRefNotnullString = try container.decode(NotnullRefNotnullString.self, forKey: notnullRefNotnullString)
+        self.notnullRefNullString = try container.decode(NotnullRefNullString.self, forKey: notnullRefNullString)
+        self.notnullString = try container.decode(NotnullString.self, forKey: notnullString)
+        self.nullRefNotnullString = try container.decode(NullRefNotnullString.self, forKey: nullRefNotnullString)
+        self.nullRefNullString = try container.decode(NullRefNullString.self, forKey: nullRefNullString)
+        self.nullString = try container.decode(NullString.self, forKey: nullString)
+    }
+
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+
+        try container.encode(self.notnullRefNotnullString, forKey: notnullRefNotnullString)
+        try container.encode(self.notnullRefNullString, forKey: notnullRefNullString)
+        try container.encode(self.notnullString, forKey: notnullString)
+        try container.encode(self.nullRefNotnullString, forKey: nullRefNotnullString)
+        try container.encode(self.nullRefNullString, forKey: nullRefNullString)
+        try container.encode(self.nullString, forKey: nullString)
+    }
 }

@@ -189,7 +189,7 @@ impl jtd_codegen::target::Target for Target {
                     writeln!(out, "public struct {}: Codable {{}}", name)?;
                 } else {
                     writeln!(out, "public struct {}: Codable {{", name)?;
-                    for (index, field) in (&fields).into_iter().enumerate() {
+                    for (index, field) in fields.iter().enumerate() {
                         if index != 0 {
                             writeln!(out)?;
                         }
@@ -203,10 +203,32 @@ impl jtd_codegen::target::Target for Target {
                         // }
                         writeln!(out, "    public var {}: {}", field.name, field.type_)?;
                     }
+
+                    // explicit CodingKeys
                     writeln!(out)?;
                     writeln!(out, "    enum CodingKeys: String, CodingKey {{")?;
                     for field in &fields {
                         writeln!(out, "        case {} = \"{}\"", field.name, field.json_name)?;
+                    }
+                    writeln!(out, "    }}")?;
+
+                    // Decodable implementation
+                    writeln!(out)?;
+                    writeln!(out, "    init(from decoder: Decoder) throws {{")?;
+                    writeln!(out, "        var container = decoder.container(keyedBy: CodingKeys.self)")?;
+                    writeln!(out)?;
+                    for field in &fields {
+                        writeln!(out, "        self.{0} = try container.decode({1}.self, forKey: {0})", field.name, field.type_)?;
+                    }
+                    writeln!(out, "    }}")?;
+                    
+                    // Encodable implementation
+                    writeln!(out)?;
+                    writeln!(out, "    func encode(to encoder: Encoder) throws {{")?;
+                    writeln!(out, "        var container = encoder.container(keyedBy: CodingKeys.self)")?;
+                    writeln!(out)?;
+                    for field in &fields {
+                        writeln!(out, "        try container.encode(self.{0}, forKey: {0})", field.name)?;
                     }
                     writeln!(out, "    }}")?;
 

@@ -8,4 +8,16 @@ public struct RootFoo: Codable {
     enum CodingKeys: String, CodingKey {
         case bar = "bar"
     }
+
+    init(from decoder: Decoder) throws {
+        var container = decoder.container(keyedBy: CodingKeys.self)
+
+        self.bar = try container.decode(RootFooBar.self, forKey: bar)
+    }
+
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+
+        try container.encode(self.bar, forKey: bar)
+    }
 }

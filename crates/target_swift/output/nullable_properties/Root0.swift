@@ -17,4 +17,22 @@ public struct Root0: Codable {
         case foo = "foo"
         case quux = "quux"
     }
+
+    init(from decoder: Decoder) throws {
+        var container = decoder.container(keyedBy: CodingKeys.self)
+
+        self.bar = try container.decode(String.self, forKey: bar)
+        self.baz = try container.decode([Bool].self, forKey: baz)
+        self.foo = try container.decode(Bool.self, forKey: foo)
+        self.quux = try container.decode([Bool].self, forKey: quux)
+    }
+
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+
+        try container.encode(self.bar, forKey: bar)
+        try container.encode(self.baz, forKey: baz)
+        try container.encode(self.foo, forKey: foo)
+        try container.encode(self.quux, forKey: quux)
+    }
 }
